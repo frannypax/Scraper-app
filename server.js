@@ -12,7 +12,7 @@ var path = require('path');
 // First, telling the console what server.js is doing
 console.log("\n***********************************\n" +
             "Grabbing every thread name and link\n" +
-            "from cnn's website" +
+            "from bloomberg tech news website" +
             "\n***********************************\n");
 
 // Making a request for bloomberg.com/technology. The page's HTML is passed as the callback's third argument
@@ -27,18 +27,19 @@ request("https://www.bloomberg.com/technology", function(error, response, html) 
 
   // With cheerio, find each h2-tag with the "technology" class
   // (i: iterator. element: the current element)
-  $("h3").each(function(i, element) {
+  $("li.tech-latest-story").each(function(i, element) {
 
     // Save the text of the element in a "breakingNews" variable
     var title = $(element).text();
 
     // In the currently selected element, look at its child elements (i.e., its a-tags),
     // then save the values for any "href" attributes that the child elements may have
-    // var link = $(element).children().attr("href");
+    var link = $(element).children().attr("href");
 
     // Save these results in an object that we'll push into the results array we defined earlier
     results.push({
-      title: title
+      title: title,
+      link: link
     });
   });
 
