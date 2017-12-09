@@ -1,70 +1,135 @@
-var express = require('express');
-var bodyParser = require('body-parser');
-var expressHandlebars = require('express-handlebars');
-var mongoose = require('mongoose');
-//// Parses our HTML and helps us find elements
-var cheerio = require('cheerio');
-// Makes HTTP request for HTML page
-var request = require('request');
-var path = require('path');
-//var db = require('./models');
+//requiring dependencies
+var express = require("express");
+var bodyParser = require("body-parser");
+var logger = require("morgan");
+var mongoose = require("mongoose");
+var expressHandlebars = require("express-handlebars"); 
+  //models
+var Note = require("./models/Note.js");
+var Article = require("./models/Article.js");
+  //scraping tools
+var request = require("request");
+var cheerio = require("cheerio");
 
-// First, telling the console what server.js is doing
-console.log("\n***********************************\n" +
-            "Grabbing every thread name and link\n" +
-            "from bloomberg tech news website" +
-            "\n***********************************\n");
+//configuring express
+var app = express();
+var PORT = process.env.PORT || 8000;
 
-// Making a request for bloomberg.com/technology. The page's HTML is passed as the callback's third argument
-request("https://www.bloomberg.com/technology", function(error, response, html) {
+app.use(logger("dev"));
+app.use(bodyParser.urlencoded({
+  extended: false
+}));
 
-  // Load the HTML into cheerio and save it to a variable
-  // '$' becomes a shorthand for cheerio's selector commands, much like jQuery's '$'
-  var $ = cheerio.load(html);
+app.use(express.static("public"));
 
-  // An empty array to save the data that we'll scrape
-  var results = [];
+// Set mongoose to leverage built in JavaScript ES6 Promises
+// Connect to the Mongo DB
+mongoose.Promise = Promise;
+mongoose.connect("mongodb://localhost/bloombergTechNews", {
+  useMongoClient: true
+});
+var db = mongoose.connection;
 
-  // With cheerio, find each h2-tag with the "technology" class
-  // (i: iterator. element: the current element)
-  $("li.tech-latest-story").each(function(i, element) {
+db.on("error", function(err) {
+  console.log("Mongoose Error: ", err);
+});
+db.once("open", function() {
+  console.log("Db connection successfull !!!");
+});
 
-    // Save the text of the element in a "breakingNews" variable
-    var title = $(element).text();
+//making http request to target web page
+app.get("/scrape", function(req, res) {
+  request("https://bloomberg.com/technology", function(error, response, html) {
+   
+    var $ = cheerio.load(html); 
+    $("li.tech-latest-story").each(function(i, element) {
+      
+      // Save an empty result object
+      var result = {};
 
-    // In the currently selected element, look at its child elements (i.e., its a-tags),
-    // then save the values for any "href" attributes that the child elements may have
-    var link = $(element).children().attr("href");
+      result.title = $(this)
+        .children("a")
+        .text();
+      result.link = $(this)
+        .children("a")
+        .attr("href");
+     
+      var entry = new Article(result);
+      entry.save(function(err, doc) {
+        {unique: true}
+        if (err) {
+          console.log(err);
+        }
+        else {
+          console.log(doc);
+        }
+      });
 
-    // Save these results in an object that we'll push into the results array we defined earlier
-    results.push({
-      title: title,
-      link: link
     });
   });
+  res.redirect("/");
+});
 
-  // Log the results once you've looped through each of the elements found with cheerio
-  console.log(results);
+app.get("/articles", function(req, res) {
+  Article.find({}, function(error, doc) {
+    if (error) {
+      console.log(error);
+    }
+    else {
+      res.json(doc);
+    }
+  });
+});
+
+app.get("/articles/:id", function(req, res) {
+  Article.findOne({ "_id": req.params.id })
+  .populate("note")
+  .exec(function(error, doc) {
+    if (error) {
+      console.log(error);
+    }
+    else {
+      res.json(doc);
+    }
+  });
 });
 
 
-//Route files
-var routes = require('./routes/index');
+app.post("/articles/:id", function(req, res) {
+  var newNote = new Note(req.body);
 
-//Initializing express
-var app = express();
-//setting up public folder for web app
-app.use(express.static("public"));
+  newNote.save(function(error, doc) {
+    if (error) {
+      console.log(error);
+    }
+    else {
+      Article.findOneAndUpdate({ "_id": req.params.id }, { "note": doc._id })
+      .exec(function(err, doc) {
+        if (err) {
+          console.log(err);
+        }
+        else {
+          res.send(doc);
+        }
+      });
+    }
+  });
+});
+app.delete("/delete/:id", function (req, res) {
+  var id = req.params.id.toString();
+  Note.remove({
+    "_id": id
+  }).exec(function (error, doc) {
+    if (error) {
+      console.log(error);
+    }
+    else {
+      console.log("deleted");
+      res.redirect("/" );
+    }
+  });
+});
 
-
-// View Engine
-app.set('views', path.join(__dirname, 'views'));
-app.engine('handlebars', expressHandlebars({defaultLayout: 'main'}));
-app.set('view engine', 'handlebars');
-
-app.use('/', routes);
-
-//setting up app to listen on 3000
-app.listen(8000, function(){
-	console.log("Scrapper App is listening on Port:",8000)
+app.listen(PORT, function() {
+  console.log("App listening on port:", PORT);
 });

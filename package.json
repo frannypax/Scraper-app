@@ -1,27 +1,22 @@
 {
-  "name": "scraper-app",
+  "name": "web-scraper",
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "watch": "nodemon server.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/frannypax/scraper-app.git"
-  },
-  "author": "",
+  "author": "Franny",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/frannypax/scraper-app/issues"
-  },
-  "homepage": "https://github.com/frannypax/scraper-app#readme",
   "dependencies": {
+    "axios": "^0.16.2",
     "body-parser": "^1.18.2",
     "cheerio": "^1.0.0-rc.2",
-    "express": "^4.16.2",
+    "express": "^4.16.1",
     "express-handlebars": "^3.0.0",
-    "mongoose": "^4.13.6",
-    "request": "^2.83.0"
+    "mongoose": "^4.12.0",
+    "morgan": "^1.9.0"
   }
 }

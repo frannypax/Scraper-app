@@ -1,0 +1,43 @@
+#container {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-top: 5%;
+    }
+    .scraper{
+    overflow: auto;
+    margin-left: 5%;
+
+    }
+    #articles {
+    display: inline-block;
+    overflow: auto;
+    width: 50%;
+    height: 400px;
+    margin-left: 5%;
+    border-style: ridge;
+    border-radius: 5px;
+    }
+    #notes {
+    float: right;
+    width: 35%;
+    height:20%;
+    margin-left: 5%;
+    margin-right: 5%;
+    }
+    #savenote{
+        margin-top: 5px
+    }
+    #deletenote{
+        margin-left: 5px
+    }
+    textarea, input {
+    display: block;
+    width: 100%;
+    background-color: #eeeeee
+    }
+    textarea {
+    height: 200px;
+    font-size: 20px;
+    }
+   
