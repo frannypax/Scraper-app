@@ -25,9 +25,13 @@ app.use(express.static("public"));
 // Set mongoose to leverage built in JavaScript ES6 Promises
 // Connect to the Mongo DB
 mongoose.Promise = Promise;
-mongoose.connect("mongodb://localhost/bloombergTechNews", {
+// mongoose.connect("mongodb://localhost/bloombergTechNews", {
+//   useMongoClient: true
+// });
+mongoose.connect("mongodb://franny:bloombergdb123@ds133876.mlab.com:33876/btechnews001", {
   useMongoClient: true
 });
+
 var db = mongoose.connection;
 
 db.on("error", function(err) {
@@ -55,6 +59,7 @@ app.get("/scrape", function(req, res) {
         .attr("href");
      
       var entry = new Article(result);
+
       entry.save(function(err, doc) {
         {unique: true}
         if (err) {
