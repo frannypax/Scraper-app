@@ -25,12 +25,12 @@ app.use(express.static("public"));
 // Set mongoose to leverage built in JavaScript ES6 Promises
 // Connect to the Mongo DB
 mongoose.Promise = Promise;
-// mongoose.connect("mongodb://localhost/bloombergTechNews", {
-//   useMongoClient: true
-// });
-mongoose.connect("mongodb://franny:bloombergdb123@ds133876.mlab.com:33876/btechnews001", {
+mongoose.connect("mongodb://localhost/bloombergTechNews", {
   useMongoClient: true
 });
+// mongoose.connect("mongodb://franny:bloombergdb123@ds133876.mlab.com:33876/btechnews001", {
+//   useMongoClient: true
+// });
 
 var db = mongoose.connection;
 
@@ -53,6 +53,7 @@ app.get("/scrape", function(req, res) {
 
       result.title = $(this)
         .children("a")
+        //.children("span")
         .text();
       result.link = $(this)
         .children("a")
@@ -76,9 +77,10 @@ app.get("/scrape", function(req, res) {
 });
 
 app.get("/articles", function(req, res) {
-  Article.find({}, function(error, doc) {
-    if (error) {
-      console.log(error);
+  Article.find({}, function(err, doc) {
+    if (err) {
+      console.log(
+        );
     }
     else {
       res.json(doc);
@@ -89,8 +91,8 @@ app.get("/articles", function(req, res) {
 app.get("/articles/:id", function(req, res) {
   Article.findOne({ "_id": req.params.id })
   .populate("note")
-  .exec(function(error, doc) {
-    if (error) {
+  .exec(function(err, doc) {
+    if (err) {
       console.log(error);
     }
     else {
