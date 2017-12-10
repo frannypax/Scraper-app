@@ -28,9 +28,9 @@ mongoose.Promise = Promise;
 mongoose.connect("mongodb://localhost/bloombergTechNews", {
   useMongoClient: true
 });
-// mongoose.connect("mongodb://franny:bloombergdb123@ds133876.mlab.com:33876/btechnews001", {
-//   useMongoClient: true
-// });
+mongoose.connect("mongodb://franny:bloombergdb123@ds133876.mlab.com:33876/btechnews001", {
+  useMongoClient: true
+});
 
 var db = mongoose.connection;
 
