@@ -1,7 +1,7 @@
 $.getJSON("/articles", function(data) {
   for (var i = 0; i < data.length; i++) {
     var mainUrl = "https://www.bloomberg.com"
-    $("#articles").append("<div class='panel panel-default'><div class='panel-heading'> <p data-id='" + data[i]._id + "'>" + data[i].title + "</p></div>" + "<div class='panel-body'><a href='" + mainUrl+data[i].link + "'>Link to Article</p>");
+    $("#articles").append("<div class='panel panel-default'><div class='panel-heading'> <p data-id='" + data[i]._id + "'>" + data[i].title + "</p></div>" + "<div class='panel-body'><a href='" + mainUrl+data[i].link + "'>Read Article</p>");
   }
 });
 
@@ -17,8 +17,8 @@ $(document).on("click", "p", function() {
       console.log(data);
       $("#notes").append("<h3>" + data.title + "</h3>");
       $("#notes").append("<textarea id='bodyinput' name='body'></textarea>");
-      $("#notes").append("<button data-id='" + data._id + "' id='savenote'>Save Note</button>");
-      $("#notes").append("<button data-id='" + data.note._id + "' id='deletenote'>Delete Note</button>");
+      $("#notes").append("<button data-id='" + data._id + "' id='savenote'>Post Comment</button>");
+      $("#notes").append("<button data-id='" + data.note._id + "' id='deletenote'>Delete Comment</button>");
       if (data.note) {
         $("#bodyinput").val(data.note.body);
       }
